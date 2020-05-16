@@ -5,7 +5,9 @@ import sys
 import time
 import errno
 
-def Subscribe(sock):
+import packet
+
+def SendSubscribe(sock):
   sock.sendall(
     'SUBSCRIBE\nId:123\n\n'
   )
@@ -39,6 +41,16 @@ def HandleMessages(sock):
           else:
             print 'Unrecognized message: %s' % message
 
+
+pr = packet.PacketReader(cp)
+start_time = time.time()
+with cbreak():
+  #while time.time() - start_time < 100:
+  while True:
+    res = pr.process()
+    if res == False:
+      break
+
 while True:
   print 'Client connecting to localhost:1228 ...'
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,5 +61,5 @@ while True:
     time.sleep(5)
     continue
   print '... connected!'
-  Subscribe(sock)
+  SendSubscribe(sock)
   HandleMessages(sock)
